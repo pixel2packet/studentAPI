@@ -12,6 +12,7 @@ import (
 
 	"github.com/pixel2packet/studentAPI/internal/config"
 	"github.com/pixel2packet/studentAPI/internal/http/handlers/student"
+	"github.com/pixel2packet/studentAPI/internal/storage/sqlite"
 )
 
 func main() {
@@ -19,11 +20,17 @@ func main() {
 	cfg := config.MustLoad()
 
 	// database setup
+	storage, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slog.Info("storage intialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
 
 	// setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/students", student.New())
+	router.HandleFunc("POST /api/students", student.New(storage))
 
 	// setup server
 	server := http.Server{
