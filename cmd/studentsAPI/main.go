@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/pixel2packet/studentAPI/internal/config"
+	"github.com/pixel2packet/studentAPI/internal/http/handlers/student"
 )
 
 func main() {
@@ -22,9 +23,7 @@ func main() {
 	// setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	// setup server
 	server := http.Server{
@@ -43,7 +42,7 @@ func main() {
 	go func() {
 		err := server.ListenAndServe()
 		if err != nil {
-			log.Fatal("failed to start server")
+			log.Fatalf("failed to start server %s", err)
 		}
 	}()
 
