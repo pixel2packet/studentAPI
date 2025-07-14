@@ -50,6 +50,15 @@ func main() {
 	router.HandleFunc("GET /api/students/", student.GetList(storage))
 
 	// setup server
+	/*
+	1. Starts server in background using goroutine
+	2. Waits for shutdown signal (Ctrl+C)
+	3. When received → logs "shutting down"
+	4. Creates 5s timeout context
+	5. Calls server.Shutdown(ctx) to gracefully close
+	6. Logs error if shutdown fails
+	7. Else logs "successfully stopped"
+	*/
 	server := http.Server{
 		Addr:    cfg.Addr,
 		Handler: router,
@@ -62,6 +71,12 @@ func main() {
 	done := make(chan os.Signal, 1)
 
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGALRM)
+	/* Tells Go to send OS signals into your done channel
+	os.Interrupt = when you press Ctrl+C
+	syscall.SIGINT = same as os.Interrupt (just OS-level)
+	SIGALRM is usually used for timers/alarms on Unix systems (you may not need this)
+	*/
+
 
 	go func() {
 		err := server.ListenAndServe()
