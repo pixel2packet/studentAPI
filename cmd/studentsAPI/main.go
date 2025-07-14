@@ -18,6 +18,13 @@ import (
 func main() {
 	// load config
 	cfg := config.MustLoad()
+	// fmt.Println("loading config:", cfg.StoragePath)
+	/* The MustLoad() function does:-----------------
+	       Reads CONFIG_PATH from env or command-line
+	       Validates the file exists
+	       Loads values into a Config struct
+	   	Crashes early if anything goes wrong
+	     	Returns a usable pointer to the config */
 
 	// database setup
 	storage, err := sqlite.New(cfg)
@@ -26,6 +33,14 @@ func main() {
 	}
 
 	slog.Info("storage intialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
+	/* Think of *sql.DB as:
+	A smart manager that:
+		Keeps a pool of open connections to the DB (to reuse them)
+		Sends SQL queries
+		Reads query results (e.g., rows from a SELECT)
+		Handles timeouts, retries, and concurrency for you
+	*/
 
 	// setup router
 	router := http.NewServeMux()
